@@ -31,65 +31,96 @@
             <artifactId>deployment-configuration-annotations</artifactId>
             <version>${syndicate.java.plugin.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-lambda-java-events</artifactId>
+            <version>3.11.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-s3</artifactId>
+            <version>1.12.503</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-core</artifactId>
+            <version>1.12.503</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-lambda-java-core</artifactId>
+            <version>1.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-lambda-java-events</artifactId>
+            <version>3.11.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-lambda-java-log4j2</artifactId>
+            <version>1.5.0</version>
+        </dependency>
     </dependencies>
 
-    <build>
-        <sourceDirectory>${src.dir}</sourceDirectory>
-        <resources>
-            <resource>
-                <directory>${resources.dir}</directory>
-            </resource>
-        </resources>        
-        <plugins>
-            <plugin>
-                <groupId>net.sf.aws-syndicate</groupId>
-                <artifactId>deployment-configuration-maven-plugin</artifactId>
-                <version>${syndicate.java.plugin.version}</version>
-                <configuration>
-                    <packages>
-                        <package>com.task02</package>
-                    </packages>
-                    <fileName>${project.name}-${project.version}.jar</fileName>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>generate-config</id>
-                        <phase>compile</phase>
-                        <inherited>false</inherited>
-                        <goals>
-                            <goal>gen-deployment-config</goal>
-                            <goal>assemble-lambda-layer-files</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>${maven-shade-plugin.version}</version>
-                <configuration>
-                    <filters>
-                        <filter>
-                            <artifact>*:*</artifact>
-                            <excludes>
-                                <exclude>META-INF/*.SF</exclude>
-                                <exclude>META-INF/*.DSA</exclude>
-                                <exclude>META-INF/*.RSA</exclude>
-                            </excludes>
-                        </filter>
-                    </filters>
-                    <createDependencyReducedPom>false</createDependencyReducedPom>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 
-</project>
+<build>
+<sourceDirectory>${src.dir}</sourceDirectory>
+<resources>
+    <resource>
+        <directory>${resources.dir}</directory>
+    </resource>
+</resources>
+<plugins>
+    <plugin>
+        <groupId>net.sf.aws-syndicate</groupId>
+        <artifactId>deployment-configuration-maven-plugin</artifactId>
+        <version>${syndicate.java.plugin.version}</version>
+        <configuration>
+            <packages>
+                <package>com.task02</package>
+            </packages>
+            <fileName>${project.name}-${project.version}.jar</fileName>
+        </configuration>
+        <executions>
+            <execution>
+                <id>generate-config</id>
+                <phase>compile</phase>
+                <inherited>false</inherited>
+                <goals>
+                    <goal>gen-deployment-config</goal>
+                    <goal>assemble-lambda-layer-files</goal>
+                </goals>
+            </execution>
+        </executions>
+    </plugin>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>${maven-shade-plugin.version}</version>
+        <configuration>
+            <filters>
+                <filter>
+                    <artifact>*:*</artifact>
+                    <excludes>
+                        <exclude>META-INF/*.SF</exclude>
+                        <exclude>META-INF/*.DSA</exclude>
+                        <exclude>META-INF/*.RSA</exclude>
+                    </excludes>
+                </filter>
+            </filters>
+            <createDependencyReducedPom>false</createDependencyReducedPom>
+        </configuration>
+        <executions>
+            <execution>
+                <phase>package</phase>
+                <goals>
+                    <goal>shade</goal>
+                </goals>
+            </execution>
+        </executions>
+    </plugin>
+</plugins>
+</build>
+
+        </project>
