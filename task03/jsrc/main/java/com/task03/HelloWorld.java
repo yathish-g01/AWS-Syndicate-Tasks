@@ -21,29 +21,13 @@ import java.util.Map;
 		authType = AuthType.NONE,
 		invokeMode = InvokeMode.BUFFERED
 )
-public class HelloWorld implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+public class HelloWorld implements RequestHandler<Object, Map<String, Object>> {
 
-	@Override
-	public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent event, Context context) {
-		context.getLogger().log("Received event: " + event);
-
-		// Create headers
-		Map<String, String> headers = new HashMap<>();
-		headers.put("Content-Type", "application/json");
-
-		// Check if the request is for the /hello resource with the GET method
-		if ("/hello".equals(event.getPath()) && "GET".equalsIgnoreCase(event.getHttpMethod())) {
-			// Return the predefined message
-			return new APIGatewayProxyResponseEvent()
-					.withStatusCode(200)
-					.withHeaders(headers)
-					.withBody("{\"statusCode\": 200, \"message\": \"Hello from Lambda\"}");
-		} else {
-			// Return a 400 Bad Request error for any other endpoint
-			return new APIGatewayProxyResponseEvent()
-					.withStatusCode(400)
-					.withHeaders(headers)
-					.withBody("{\"statusCode\": 400, \"message\": \"Bad request syntax or unsupported method.\"}");
-		}
+	public Map<String, Object> handleRequest(Object request, Context context) {
+		System.out.println("Hello from lambda");
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		resultMap.put("statusCode", 200);
+		resultMap.put("message", "Hello from Lambda");
+		return resultMap;
 	}
 }
