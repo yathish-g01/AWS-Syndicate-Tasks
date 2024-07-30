@@ -33,7 +33,7 @@
         </dependency>
     </dependencies>
 
-    <build>
+    <build>syndic
         <sourceDirectory>${src.dir}</sourceDirectory>
         <resources>
             <resource>
