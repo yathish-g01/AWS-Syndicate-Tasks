@@ -19,8 +19,8 @@
     } ],
     "event_sources" : [ ],
     "env_variables" : {
-      "region" : "eu-central-1",
-      "table" : "Events"
+      "region" : "${region}",
+      "table" : "${target_table}"
     },
     "publish_version" : false,
     "logs_expiration" : "${logs_expiration}",

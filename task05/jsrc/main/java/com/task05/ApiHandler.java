@@ -16,6 +16,7 @@ import com.syndicate.deployment.model.ResourceType;
 import com.syndicate.deployment.model.RetentionSetting;
 import com.syndicate.deployment.model.lambda.url.AuthType;
 import com.syndicate.deployment.model.lambda.url.InvokeMode;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
@@ -39,12 +40,14 @@ import java.util.UUID;
 @DependsOn(name="Events", resourceType = ResourceType.DYNAMODB_TABLE)
 
 @EnvironmentVariables(value = {
-		@EnvironmentVariable(key = "region", value = "eu-central-1"),
-		@EnvironmentVariable(key = "table", value = "Events"),})
+		@EnvironmentVariable(key = "region", value = "${region}"),
+		@EnvironmentVariable(key = "table", value = "${target_table}"),})
 public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
-	private final DynamoDbClient dynamoDbClient = DynamoDbClient.builder().build();
-	private final String tableName = System.getenv("table"); // Use the environment variable
+	private final DynamoDbClient dynamoDbClient = DynamoDbClient.builder()
+			.region(Region.of("eu-central-1"))
+			.build();
+	private final String tableName = "Events";
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Override
