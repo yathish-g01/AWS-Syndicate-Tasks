@@ -44,7 +44,7 @@ import java.util.UUID;
 public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
 	private final DynamoDbClient dynamoDbClient = DynamoDbClient.builder().build();
-	private final String tableName = "Events";
+	private final String tableName = System.getenv("table"); // Use the environment variable
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Override
@@ -53,16 +53,24 @@ public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, A
 		try {
 			requestBody = objectMapper.readValue(request.getBody(), new TypeReference<Map<String, Object>>() {});
 		} catch (JsonProcessingException e) {
-			e.printStackTrace();
+			context.getLogger().log("Invalid request body: " + e.getMessage());
 			return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody("Invalid request body");
 		}
 
-		Integer principalId = (Integer) requestBody.get("principalId");
+		// Parse principalId as an integer
+		Integer principalId;
+		try {
+			principalId = Integer.parseInt(requestBody.get("principalId").toString());
+		} catch (NumberFormatException e) {
+			context.getLogger().log("Invalid principalId format: " + e.getMessage());
+			return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody("Invalid principalId format");
+		}
+
 		Map<String, String> content;
 		try {
 			content = objectMapper.convertValue(requestBody.get("content"), new TypeReference<Map<String, String>>() {});
 		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
+			context.getLogger().log("Invalid content format: " + e.getMessage());
 			return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody("Invalid content format");
 		}
 
@@ -80,7 +88,13 @@ public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, A
 				.item(item)
 				.build();
 
-		dynamoDbClient.putItem(putItemRequest);
+		try {
+			dynamoDbClient.putItem(putItemRequest);
+			context.getLogger().log("Item successfully saved to DynamoDB: " + item);
+		} catch (Exception e) {
+			context.getLogger().log("Error saving item to DynamoDB: " + e.getMessage());
+			return new APIGatewayProxyResponseEvent().withStatusCode(500).withBody("Error saving event to DynamoDB");
+		}
 
 		Map<String, Object> event = new HashMap<>();
 		event.put("id", eventId);
@@ -88,12 +102,16 @@ public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, A
 		event.put("createdAt", createdAt);
 		event.put("body", content);
 
+		// Wrap the event in a map with the "event" key
+		Map<String, Object> responseBody = new HashMap<>();
+		responseBody.put("event", event);
+
 		APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
 		response.setStatusCode(201);
 		try {
-			response.setBody(objectMapper.writeValueAsString(event));
+			response.setBody(objectMapper.writeValueAsString(responseBody));
 		} catch (JsonProcessingException e) {
-			e.printStackTrace();
+			context.getLogger().log("Error processing response: " + e.getMessage());
 			return new APIGatewayProxyResponseEvent().withStatusCode(500).withBody("Error processing response");
 		}
 		return response;
