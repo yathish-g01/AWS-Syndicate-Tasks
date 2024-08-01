@@ -53,9 +53,25 @@
           "integration_type": "lambda",
           "lambda_name": "api_handler",
           "api_key_required": false,
+          "request_validator": {
+            "name": "Validate body and parameters",
+            "validate_request_body": true,
+            "validate_request_parameters": false
+          },
+          "enable_proxy": true,
+          "integration_request_body_template": {
+            "application/json": "{\n  \"principalId\": $input.json('$.principalId'),\n  \"content\": $input.json('$.content')\n}"
+          },
           "method_request_parameters": {},
-          "integration_request_body_template": {},
-          "responses": [],
+          "responses": [
+            {
+              "status_code": "201",
+              "response_parameters": {},
+              "response_models": {
+                "application/json": "Empty"
+              }
+            }
+          ],
           "integration_responses": [],
           "default_error_pattern": true
         }
