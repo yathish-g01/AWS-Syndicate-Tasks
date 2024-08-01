@@ -5,5 +5,7 @@ public class Response {
     private Event event;
 
     public Response(int statusOk, Event eventDto) {
+        this.statusCode=statusOk;
+        this.event=eventDto;
     }
 }
