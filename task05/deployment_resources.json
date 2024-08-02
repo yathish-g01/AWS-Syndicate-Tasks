@@ -60,18 +60,9 @@
           },
           "enable_proxy": true,
           "integration_request_body_template": {
-            "application/json": "{\n  \"principalId\": $input.json('$.principalId'),\n  \"content\": $input.json('$.content')\n}"
           },
           "method_request_parameters": {},
-          "responses": [
-            {
-              "status_code": "201",
-              "response_parameters": {},
-              "response_models": {
-                "application/json": "Empty"
-              }
-            }
-          ],
+          "responses": [],
           "integration_responses": [],
           "default_error_pattern": true
         }

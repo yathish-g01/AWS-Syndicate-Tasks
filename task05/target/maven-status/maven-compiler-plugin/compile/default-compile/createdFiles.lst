@@ -1,7 +1,6 @@
 com\task05\dto\Response.class
+com\task05\ObjectContentMapper.class
 com\task05\ApiHandler.class
 com\task05\dto\Event.class
-com\task05\ObjectContentMapper.class
-com\task05\ApiHandler$1.class
 com\task05\dto\Request.class
 com\task05\DynamoDBEvent.class
