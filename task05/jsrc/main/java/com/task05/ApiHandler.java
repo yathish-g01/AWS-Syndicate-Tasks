@@ -112,7 +112,10 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.syndicate.deployment.annotations.environment.EnvironmentVariable;
 import com.syndicate.deployment.annotations.environment.EnvironmentVariables;
 import com.syndicate.deployment.annotations.lambda.LambdaHandler;
+import com.syndicate.deployment.annotations.lambda.LambdaUrlConfig;
 import com.syndicate.deployment.model.RetentionSetting;
+import com.syndicate.deployment.model.lambda.url.AuthType;
+import com.syndicate.deployment.model.lambda.url.InvokeMode;
 import com.task05.dto.Event;
 import com.task05.dto.Request;
 import com.task05.dto.Response;
@@ -128,8 +131,13 @@ import java.util.UUID;
 		isPublishVersion = false,
 		logsExpiration = RetentionSetting.SYNDICATE_ALIASES_SPECIFIED
 )
+@LambdaUrlConfig(
+		authType = AuthType.NONE,
+		invokeMode = InvokeMode.BUFFERED
+)
 @EnvironmentVariables(value = {
-		@EnvironmentVariable(key = "target_table", value = "${target_table}")
+		@EnvironmentVariable(key = "target_table", value = "${target_table}"),
+		@EnvironmentVariable(key = "region", value = "${region}")
 })
 public class ApiHandler implements RequestHandler<Request, Response> {
 

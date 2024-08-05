@@ -14,7 +14,15 @@
             "dynamodb:DeleteItem",
             "ssm:PutParameter",
             "ssm:GetParameter",
-            "kms:Decrypt"
+            "kms:Decrypt",
+            "gateway:POST",
+            "gateway:GET",
+            "gateway:PUT",
+            "gateway:DELETE",
+            "dynamodb:GetRecords",
+            "dynamodb:GetShardIterator",
+            "dynamodb:DescribeStream",
+            "dynamodb:ListStreams"
           ],
           "Effect": "Allow",
           "Resource": "*"
@@ -32,21 +40,13 @@
     ],
     "resource_type": "iam_role"
   },
-  "Events": {
-    "resource_type": "dynamodb_table",
-    "hash_key_name": "id",
-    "hash_key_type": "S",
-    "read_capacity": 1,
-    "write_capacity": 1,
-    "global_indexes": [],
-    "autoscaling": []
-  },
-  "task3_api": {
+  "task5_api": {
     "resource_type": "api_gateway",
     "deploy_stage": "api",
     "dependencies": [],
     "resources": {
       "/events": {
+        "enable_cors": false,
         "POST": {
           "authorization_type": "NONE",
           "integration_type": "lambda",
@@ -61,5 +61,14 @@
       }
     },
     "minimum_compression_size": 0
+  },
+  "Events": {
+    "resource_type": "dynamodb_table",
+    "hash_key_name": "id",
+    "hash_key_type": "S",
+    "read_capacity": 1,
+    "write_capacity": 1,
+    "global_indexes": [],
+    "autoscaling": []
   }
 }

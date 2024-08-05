@@ -16,10 +16,15 @@
     "dependencies" : [ ],
     "event_sources" : [ ],
     "env_variables" : {
-      "target_table" : "${target_table}"
+      "target_table" : "${target_table}",
+      "region" : "${region}"
     },
     "publish_version" : false,
     "logs_expiration" : "${logs_expiration}",
-    "snap_start" : "None"
+    "snap_start" : "None",
+    "url_config" : {
+      "auth_type" : "NONE",
+      "invoke_mode" : "BUFFERED"
+    }
   }
 }
