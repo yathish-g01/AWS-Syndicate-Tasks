@@ -1,22 +1,16 @@
 package com.task05.dto;
 
+
+import lombok.*;
+
+import java.util.Map;
+
+@Builder
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Request {
-    private Integer principalId;
-    private Object content;
-
-    public Integer getPrincipalId() {
-        return principalId;
-    }
-
-    public void setPrincipalId(Integer principalId) {
-        this.principalId = principalId;
-    }
-
-    public Object getContent() {
-        return content;
-    }
-
-    public void setContent(Object content) {
-        this.content = content;
-    }
+    private int principalId;
+    private Map<String, String> content;
 }

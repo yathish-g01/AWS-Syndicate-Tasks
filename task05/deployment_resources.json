@@ -41,27 +41,19 @@
     "global_indexes": [],
     "autoscaling": []
   },
-  "task5_api": {
+  "task3_api": {
     "resource_type": "api_gateway",
     "deploy_stage": "api",
     "dependencies": [],
     "resources": {
       "/events": {
-        "enable_cors": false,
         "POST": {
           "authorization_type": "NONE",
           "integration_type": "lambda",
           "lambda_name": "api_handler",
           "api_key_required": false,
-          "request_validator": {
-            "name": "Validate body and parameters",
-            "validate_request_body": true,
-            "validate_request_parameters": false
-          },
-          "enable_proxy": true,
-          "integration_request_body_template": {
-          },
           "method_request_parameters": {},
+          "integration_request_body_template": {},
           "responses": [],
           "integration_responses": [],
           "default_error_pattern": true

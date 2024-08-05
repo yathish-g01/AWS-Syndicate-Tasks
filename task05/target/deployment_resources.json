@@ -13,21 +13,13 @@
     "timeout" : 300,
     "subnet_ids" : [ ],
     "security_group_ids" : [ ],
-    "dependencies" : [ {
-      "resource_name" : "Events",
-      "resource_type" : "dynamodb_table"
-    } ],
+    "dependencies" : [ ],
     "event_sources" : [ ],
     "env_variables" : {
-      "region" : "${region}",
-      "table" : "${target_table}"
+      "target_table" : "${target_table}"
     },
     "publish_version" : false,
     "logs_expiration" : "${logs_expiration}",
-    "snap_start" : "None",
-    "url_config" : {
-      "auth_type" : "NONE",
-      "invoke_mode" : "BUFFERED"
-    }
+    "snap_start" : "None"
   }
 }

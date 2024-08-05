@@ -6,7 +6,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
 import java.util.Map;
 
-@DynamoDBTable(tableName = "cmtr-6c6b70bd-Events")
+@DynamoDBTable(tableName = "Events")
 public class DynamoDBEvent {
 
     private String id;
