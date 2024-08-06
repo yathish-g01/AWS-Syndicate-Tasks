@@ -1,0 +1,36 @@
+{
+  "api_handler" : {
+    "name" : "api_handler",
+    "lambda_path" : "C:\\Users\\yathish_g\\AWS-Syndicate-Tasks\\task08",
+    "version" : "1.0-SNAPSHOT",
+    "func_name" : "com.task08.ApiHandler",
+    "deployment_package" : "weather-lambda-java-1.0-SNAPSHOT.jar",
+    "resource_type" : "lambda",
+    "runtime" : "java11",
+    "architectures" : [ "x86_64" ],
+    "iam_role_name" : "api_handler-role",
+    "memory" : 1024,
+    "timeout" : 300,
+    "subnet_ids" : [ ],
+    "security_group_ids" : [ ],
+    "dependencies" : [ ],
+    "event_sources" : [ ],
+    "env_variables" : { },
+    "publish_version" : false,
+    "layers" : [ "open-meteo-weather-api" ],
+    "logs_expiration" : "${logs_expiration}",
+    "snap_start" : "None",
+    "url_config" : {
+      "auth_type" : "NONE",
+      "invoke_mode" : "BUFFERED"
+    }
+  },
+  "open-meteo-weather-api" : {
+    "name" : "open-meteo-weather-api",
+    "runtimes" : [ "java11" ],
+    "resource_type" : "lambda_layer",
+    "deployment_package" : "open-meteo-weather-api-assembly.zip",
+    "libraries" : [ "layer/java/lib/weather-lambda-java-1.0-SNAPSHOT.jar" ],
+    "architectures" : [ "arm64" ]
+  }
+}
