@@ -56,6 +56,7 @@ package com.task08;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.example.weather.OpenMeteoWeatherApi;
 import com.syndicate.deployment.annotations.lambda.LambdaHandler;
 import com.syndicate.deployment.annotations.lambda.LambdaLayer;
 import com.syndicate.deployment.annotations.lambda.LambdaUrlConfig;
@@ -91,23 +92,30 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
     public Map<String, Object> handleRequest(Map<String, Object> input, Context context) {
         Map<String, Object> response = new HashMap<>();
 
+        context.getLogger().log("Instantiating OpenMeteoWeatherApi client...");
+
+        OpenMeteoWeatherApi client;
         try {
-            Class<?> apiClientClass = Class.forName("com.task08.weather.OpenMeteoWeatherApi");
-            Object apiClient = apiClientClass.getDeclaredConstructor().newInstance();
-            // in presence of lambda layer
-            String weatherData = (String) apiClientClass.getMethod("getWeatherForecast").invoke(apiClient);
+            client = new OpenMeteoWeatherApi();
+        } catch (Exception e) {
+            context.getLogger().log("Error instantiating OpenMeteoWeatherApi: " + e.getMessage());
+            response.put("statusCode", 500);
+            response.put("body", "Error: " + e.getMessage());
+            return response;
+        }
+
+        try {
+            String weatherData = client.getWeatherForecast(); // Example coordinates (Berlin)
             response.put("statusCode", 200);
             response.put("body", weatherData);
-        } catch (ClassNotFoundException e) {
-            // lambda layer is absent
-            response.put("statusCode", 200);
-            response.put("body", "Lambda Layer is not present. Please attach the Layer to get weather data.");
         } catch (Exception e) {
+            context.getLogger().log("Error fetching weather data: " + e.getMessage());
             response.put("statusCode", 500);
-            response.put("body", "Error occurred while fetching weather data: " + e.getMessage());
+            response.put("body", "Error: " + e.getMessage());
         }
 
         return response;
     }
 }
+
 
