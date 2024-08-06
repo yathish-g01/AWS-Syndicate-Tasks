@@ -65,7 +65,6 @@ import com.syndicate.deployment.model.DeploymentRuntime;
 import com.syndicate.deployment.model.RetentionSetting;
 import com.syndicate.deployment.model.lambda.url.AuthType;
 import com.syndicate.deployment.model.lambda.url.InvokeMode;
-import com.task08.weather.OpenMeteoWeatherApi;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -92,20 +91,20 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
     public Map<String, Object> handleRequest(Map<String, Object> input, Context context) {
         Map<String, Object> response = new HashMap<>();
 
-        // Ensure that the SDK from the layer is being used
         try {
-            OpenMeteoWeatherApi client = new OpenMeteoWeatherApi(); // Utilizing the SDK provided by the layer
-            String weatherData = client.getWeatherForecast(52.52, 13.41); // Example coordinates (Berlin)
-
+            Class<?> apiClientClass = Class.forName("com.task08.weather.OpenMeteoWeatherApi");
+            Object apiClient = apiClientClass.getDeclaredConstructor().newInstance();
+            // in presence of lambda layer
+            String weatherData = (String) apiClientClass.getMethod("getWeatherForecast").invoke(apiClient);
             response.put("statusCode", 200);
             response.put("body", weatherData);
-        } catch (NoClassDefFoundError e) {
-            // This error might occur if the layer is not correctly attached
-            response.put("statusCode", 500);
-            response.put("body", "Error: SDK not found. Make sure the Lambda layer is correctly configured. Details: " + e.getMessage());
+        } catch (ClassNotFoundException e) {
+            // lambda layer is absent
+            response.put("statusCode", 200);
+            response.put("body", "Lambda Layer is not present. Please attach the Layer to get weather data.");
         } catch (Exception e) {
             response.put("statusCode", 500);
-            response.put("body", "Error: " + e.getMessage());
+            response.put("body", "Error occurred while fetching weather data: " + e.getMessage());
         }
 
         return response;
