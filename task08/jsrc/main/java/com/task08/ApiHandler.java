@@ -92,24 +92,18 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
     public Map<String, Object> handleRequest(Map<String, Object> input, Context context) {
         Map<String, Object> response = new HashMap<>();
 
-        context.getLogger().log("Instantiating OpenMeteoWeatherApi client...");
-
-        OpenMeteoWeatherApi client;
+        // Ensure that the SDK from the layer is being used
         try {
-            client = new OpenMeteoWeatherApi();
-        } catch (Exception e) {
-            context.getLogger().log("Error instantiating OpenMeteoWeatherApi: " + e.getMessage());
-            response.put("statusCode", 500);
-            response.put("body", "Error: " + e.getMessage());
-            return response;
-        }
-
-        try {
+            OpenMeteoWeatherApi client = new OpenMeteoWeatherApi(); // Utilizing the SDK provided by the layer
             String weatherData = client.getWeatherForecast(52.52, 13.41); // Example coordinates (Berlin)
+
             response.put("statusCode", 200);
             response.put("body", weatherData);
+        } catch (NoClassDefFoundError e) {
+            // This error might occur if the layer is not correctly attached
+            response.put("statusCode", 500);
+            response.put("body", "Error: SDK not found. Make sure the Lambda layer is correctly configured. Details: " + e.getMessage());
         } catch (Exception e) {
-            context.getLogger().log("Error fetching weather data: " + e.getMessage());
             response.put("statusCode", 500);
             response.put("body", "Error: " + e.getMessage());
         }
@@ -117,5 +111,4 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
         return response;
     }
 }
-
 
