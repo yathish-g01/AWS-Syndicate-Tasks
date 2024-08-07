@@ -1,27 +1,18 @@
 package com.task09.weatherDTO;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-public class HourlyUnits {
-
-    private String temperature2m;
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
+public  class HourlyUnits {
     private String time;
+    private String temperature_2m;
 
-    @DynamoDBAttribute(attributeName = "temperature_2m")
-    public String getTemperature2m() {
-        return temperature2m;
-    }
-
-    public void setTemperature2m(String temperature2m) {
-        this.temperature2m = temperature2m;
-    }
-
-    @DynamoDBAttribute(attributeName = "time")
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
-    }
 }
