@@ -1,0 +1,4 @@
+com\task09\weatherAPI\OpenMeteoWeatherAPI.class
+com\task09\weatherAPI\WeatherDataParser.class
+com\task09\Processor.class
+com\task09\weatherAPI\WeatherRepository.class
