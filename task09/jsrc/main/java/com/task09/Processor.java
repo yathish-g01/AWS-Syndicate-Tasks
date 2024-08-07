@@ -2,6 +2,7 @@ package com.task09;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
@@ -20,7 +21,6 @@ import com.syndicate.deployment.model.lambda.url.AuthType;
 import com.syndicate.deployment.model.lambda.url.InvokeMode;
 import com.task09.weatherAPI.OpenMeteoWeatherAPI;
 import com.task09.weatherAPI.WeatherRepository;
-import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
 import java.util.UUID;
 
@@ -44,7 +44,8 @@ public class Processor implements RequestHandler<APIGatewayProxyRequestEvent, AP
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent event, Context context) {
         AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().build();
-        DynamoDB dynamoDb = new DynamoDB(client);
+        DynamoDBMapper dynamoDbMapper = new DynamoDBMapper(client);
+        WeatherRepository weatherRepository = new WeatherRepository(dynamoDbMapper);
         AWSXRayRecorder recorder = AWSXRay.getGlobalRecorder();
         Subsegment subsegment = recorder.beginSubsegment("ProcessWeatherData");
 
@@ -55,7 +56,6 @@ public class Processor implements RequestHandler<APIGatewayProxyRequestEvent, AP
             String weatherData = weatherApi.fetchWeatherData();
 
             // Save to DynamoDB
-            WeatherRepository weatherRepository = new WeatherRepository(dynamoDb);
             weatherRepository.saveWeatherData(id, weatherData);
 
             // Return response
@@ -65,7 +65,6 @@ public class Processor implements RequestHandler<APIGatewayProxyRequestEvent, AP
             return createResponse(500, "Error: " + e.getMessage());
         } finally {
             recorder.endSubsegment();
-            dynamoDb.shutdown();
         }
     }
 

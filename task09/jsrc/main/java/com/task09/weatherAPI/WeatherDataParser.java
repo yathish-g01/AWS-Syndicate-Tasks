@@ -1,52 +1,65 @@
 package com.task09.weatherAPI;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.task09.weatherDTO.DynamoDBWeatherData;
+import com.task09.weatherDTO.Forecast;
+import com.task09.weatherDTO.Hourly;
+import com.task09.weatherDTO.HourlyUnits;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 public class WeatherDataParser {
 
-    public Map<String, Object> parseForecast(JsonNode weatherData) {
-        Map<String, Object> forecast = new HashMap<>();
-        forecast.put("elevation", weatherData.path("elevation").asDouble());
-        forecast.put("generationtime_ms", weatherData.path("generationtime_ms").asDouble());
-        forecast.put("latitude", weatherData.path("latitude").asDouble());
-        forecast.put("longitude", weatherData.path("longitude").asDouble());
-        forecast.put("timezone", weatherData.path("timezone").asText());
-        forecast.put("timezone_abbreviation", weatherData.path("timezone_abbreviation").asText());
-        forecast.put("utc_offset_seconds", weatherData.path("utc_offset_seconds").asInt());
+    public DynamoDBWeatherData parseWeatherData(JsonNode weatherData) {
+        DynamoDBWeatherData weatherDataItem = new DynamoDBWeatherData();
+        weatherDataItem.setId(weatherData.get("id").asText());
 
-        Map<String, Object> hourly = new HashMap<>();
-        hourly.put("temperature_2m", parseArray(weatherData.path("hourly").path("temperature_2m")));
-        hourly.put("time", parseArray(weatherData.path("hourly").path("time")));
-        forecast.put("hourly", hourly);
+        Forecast forecast = new Forecast();
+        forecast.setElevation(weatherData.get("forecast").get("elevation").asDouble());
+        forecast.setGenerationtimeMs(weatherData.get("forecast").get("generationtime_ms").asDouble());
+        forecast.setLatitude(weatherData.get("forecast").get("latitude").asDouble());
+        forecast.setLongitude(weatherData.get("forecast").get("longitude").asDouble());
+        forecast.setTimezone(weatherData.get("forecast").get("timezone").asText());
+        forecast.setTimezoneAbbreviation(weatherData.get("forecast").get("timezone_abbreviation").asText());
+        forecast.setUtcOffsetSeconds(weatherData.get("forecast").get("utc_offset_seconds").asInt());
 
-        Map<String, Object> hourlyUnits = new HashMap<>();
-        hourlyUnits.put("temperature_2m", weatherData.path("hourly_units").path("temperature_2m").asText());
-        hourlyUnits.put("time", weatherData.path("hourly_units").path("time").asText());
-        forecast.put("hourly_units", hourlyUnits);
+        // Parse Hourly
+        JsonNode hourlyNode = weatherData.get("forecast").get("hourly");
+        Hourly hourly = new Hourly();
+        hourly.setTemperature2m(parseDoubleList(hourlyNode.get("temperature_2m")));
+        hourly.setTime(parseStringList(hourlyNode.get("time")));
+        forecast.setHourly(hourly);
 
-        return forecast;
+        // Parse HourlyUnits
+        JsonNode hourlyUnitsNode = weatherData.get("forecast").get("hourly_units");
+        HourlyUnits hourlyUnits = new HourlyUnits();
+        hourlyUnits.setTemperature2m(hourlyUnitsNode.get("temperature_2m").asText());
+        hourlyUnits.setTime(hourlyUnitsNode.get("time").asText());
+        forecast.setHourlyUnits(hourlyUnits);
+
+        weatherDataItem.setForecast(forecast);
+
+        return weatherDataItem;
     }
 
-    private Object parseArray(JsonNode arrayNode) {
-        if (arrayNode.isArray()) {
-            if (arrayNode.size() > 0 && arrayNode.get(0).isNumber()) {
-                // Convert numbers to a list of doubles
-                return StreamSupport.stream(arrayNode.spliterator(), false)
-                        .map(JsonNode::asDouble)
-                        .collect(Collectors.toList());
-            } else {
-                // Convert strings to a list of strings
-                return StreamSupport.stream(arrayNode.spliterator(), false)
-                        .map(JsonNode::asText)
-                        .collect(Collectors.toList());
+    private List<Double> parseDoubleList(JsonNode node) {
+        List<Double> list = new ArrayList<>();
+        if (node.isArray()) {
+            for (JsonNode element : node) {
+                list.add(element.asDouble());
             }
         }
-        return null;
+        return list;
+    }
+
+    private List<String> parseStringList(JsonNode node) {
+        List<String> list = new ArrayList<>();
+        if (node.isArray()) {
+            for (JsonNode element : node) {
+                list.add(element.asText());
+            }
+        }
+        return list;
     }
 }
