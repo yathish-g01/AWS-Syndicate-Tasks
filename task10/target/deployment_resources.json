@@ -13,12 +13,24 @@
     "timeout" : 300,
     "subnet_ids" : [ ],
     "security_group_ids" : [ ],
-    "dependencies" : [ ],
+    "dependencies" : [ {
+      "resource_name" : "${booking_userpool}",
+      "resource_type" : "cognito_idp"
+    } ],
     "event_sources" : [ ],
     "env_variables" : {
       "reservations_table" : "${reservations_table}",
       "tables_table" : "${tables_table}",
-      "booking_userpool" : "${booking_userpool}"
+      "Cognito_ID" : {
+        "parameter" : "id",
+        "resource_type" : "cognito_idp",
+        "resource_name" : "${booking_userpool}"
+      },
+      "Client_ID" : {
+        "parameter" : "client_id",
+        "resource_type" : "cognito_idp",
+        "resource_name" : "${booking_userpool}"
+      }
     },
     "publish_version" : false,
     "logs_expiration" : "${logs_expiration}",

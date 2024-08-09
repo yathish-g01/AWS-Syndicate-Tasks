@@ -1,2 +1,5 @@
+com\task10\ApiHandler$1.class
 com\task10\ApiHandler.class
 com\task10\User.class
+com\task10\dto\SignIn.class
+com\task10\dto\SignUp.class
