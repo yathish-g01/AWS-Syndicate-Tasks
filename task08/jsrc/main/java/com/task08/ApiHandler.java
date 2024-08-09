@@ -1,6 +1,6 @@
 //package com.task08;
 //
-//import com.amazonaws.services.lambda.runtime.Context;
+//import    com.amazonaws.services.lambda.runtime.Context;
 //import com.amazonaws.services.lambda.runtime.RequestHandler;
 //import com.syndicate.deployment.annotations.lambda.LambdaHandler;
 //import com.syndicate.deployment.annotations.lambda.LambdaLayer;
