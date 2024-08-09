@@ -4,8 +4,8 @@ import com.amazonaws.services.cognitoidp.AWSCognitoIdentityProvider;
 import com.amazonaws.services.cognitoidp.AWSCognitoIdentityProviderClientBuilder;
 import com.amazonaws.services.cognitoidp.model.*;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
-import com.amazonaws.services.dynamodbv2.document.DynamoDB;
-import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.document.*;
+import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -65,12 +65,12 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
                 handleSignup(event, response);
             } else if ("/signin".equals(path) && "POST".equals(httpMethod)) {
                 handleSignin(event, response);
-//            } else if ("/tables".equals(path) && "GET".equals(httpMethod)) {
-//                handleGetTables(response);
-//            } else if ("/tables".equals(path) && "POST".equals(httpMethod)) {
-//                handleCreateTable(event, response);
-//            } else if (path.matches("/tables/\\d+") && "GET".equals(httpMethod)) {
-//                handleGetTableById(path, response);
+            } else if ("/tables".equals(path) && "GET".equals(httpMethod)) {
+                handleGetTables(response);
+            } else if ("/tables".equals(path) && "POST".equals(httpMethod)) {
+                handleCreateTable(event, response);
+            } else if (path.matches("/tables/\\d+") && "GET".equals(httpMethod)) {
+                handleGetTableById(path, response);
 //            } else if ("/reservations".equals(path) && "POST".equals(httpMethod)) {
 //                handleCreateReservation(event, response);
 //            } else if ("/reservations".equals(path) && "GET".equals(httpMethod)) {
@@ -102,13 +102,15 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
         System.out.println(firstName);
         System.out.println(lastName);
         System.out.println(password);
+        System.out.println(clientId);
+        System.out.println(userPoolId);
         AdminCreateUserRequest createUserRequest = new AdminCreateUserRequest()
                 .withUserPoolId(userPoolId)
                 .withUsername(email)
                 .withUserAttributes(
                         new AttributeType().withName("email").withValue(email),
-                        new AttributeType().withName("firstname").withValue(firstName),
-                        new AttributeType().withName("lastname").withValue(lastName))
+                        new AttributeType().withName("given_name").withValue(firstName),
+                        new AttributeType().withName("family_name").withValue(lastName))
                 .withTemporaryPassword(password)
                 .withMessageAction(MessageActionType.SUPPRESS);
 
@@ -139,53 +141,56 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
                     put("PASSWORD", password);
                 }})
                 .withClientId(clientId);
-
+        System.out.println(authRequest);
 
         InitiateAuthResult authResult = cognitoClient.initiateAuth(authRequest);
         String accessToken = authResult.getAuthenticationResult().getAccessToken();
+        System.out.println(authResult);
+        System.out.println(accessToken);
         response.put("statusCode", 200);
         response.put("body", "{\"accessToken\": \"" + accessToken + "\"}");
     }
 
-//    private void handleGetTables(Map<String, Object> response) throws Exception {
-//        ItemCollection<ScanOutcome> items = tablesTable.scan(new ScanSpec());
-//        List<Item> itemList = new ArrayList<>();
-//        items.forEach(itemList::add);
-//        itemList.sort(Comparator.comparing(item -> item.getInt("id")));
-//
-//        ObjectMapper mapper = new ObjectMapper();
-//        String body = mapper.writeValueAsString(Collections.singletonMap("tables", itemList));
-//        response.put("statusCode", 200);
-//        response.put("body", body);
-//    }
-//
-//    private void handleCreateTable(Map<String, Object> event, Map<String, Object> response) throws Exception {
-//        Map<String, Object> body = parseRequestBody(event);
-//        Item item = new Item()
-//                .withPrimaryKey("id", body.get("id"))
-//                .withString("number", (String) body.get("number"))
-//                .withString("places", (String) body.get("places"))
-//                .withBoolean("isVip", (Boolean) body.get("isVip"))
-//                .withNumber("minOrder", (Number) body.get("minOrder"));
-//
-//        tablesTable.putItem(item);
-//        response.put("statusCode", 200);
-//        response.put("body", "{\"id\": \"" + body.get("id") + "\"}");
-//    }
-//
-//    private void handleGetTableById(String path, Map<String, Object> response) throws Exception {
-//        int tableId = Integer.parseInt(path.split("/")[2]);
-//        Item item = tablesTable.getItem("id", tableId);
-//        if (item != null) {
-//            ObjectMapper mapper = new ObjectMapper();
-//            String body = mapper.writeValueAsString(item.asMap());
-//            response.put("statusCode", 200);
-//            response.put("body", body);
-//        } else {
-//            response.put("statusCode", 404);
-//            response.put("body", "{\"message\": \"Table not found\"}");
-//        }
-//    }
+    private void handleCreateTable(Map<String, Object> event, Map<String, Object> response) throws Exception {
+        com.task10.dto.Table body = parseTableBody(event);
+        Item item = new Item()
+                .withPrimaryKey("id", body.getId())
+                .withNumber("number",  body.getNumber())
+                .withNumber("places", body.getNumber())
+                .withBoolean("isVip", body.isVip())
+                .withNumber("minOrder",body.getMinOrder());
+
+        tablesTable.putItem(item);
+        response.put("statusCode", 200);
+        response.put("body", "{\"id\": \"" + body.getId() + "\"}");
+    }
+
+    private void handleGetTables(Map<String, Object> response) throws Exception {
+        ItemCollection<ScanOutcome> items = tablesTable.scan(new ScanSpec());
+        List<Item> itemList = new ArrayList<>();
+        items.forEach(itemList::add);
+        itemList.sort(Comparator.comparing(item -> item.getInt("id")));
+
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(Collections.singletonMap("tables", itemList));
+        response.put("statusCode", 200);
+        response.put("body", body);
+    }
+
+
+    private void handleGetTableById(String path, Map<String, Object> response) throws Exception {
+        int tableId = Integer.parseInt(path.split("/")[2]);
+        Item item = tablesTable.getItem("id", tableId);
+        if (item != null) {
+            ObjectMapper mapper = new ObjectMapper();
+            String body = mapper.writeValueAsString(item.asMap());
+            response.put("statusCode", 200);
+            response.put("body", body);
+        } else {
+            response.put("statusCode", 404);
+            response.put("body", "{\"message\": \"Table not found\"}");
+        }
+    }
 //
 //    private void handleCreateReservation(Map<String, Object> event, Map<String, Object> response) throws Exception {
 //        Map<String, Object> body = parseRequestBody(event);
@@ -249,5 +254,11 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
         String body = (String) event.get("body");
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(body, SignIn.class);
+    }
+
+    private com.task10.dto.Table parseTableBody(Map<String, Object> event) throws Exception {
+        String body = (String) event.get("body");
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(body, com.task10.dto.Table.class);
     }
 }
