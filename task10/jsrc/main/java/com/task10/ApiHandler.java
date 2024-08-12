@@ -19,6 +19,7 @@ import com.task10.dto.SignIn;
 import com.task10.dto.SignUp;
 
 import java.lang.UnsupportedOperationException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.syndicate.deployment.model.environment.ValueTransformer.USER_POOL_NAME_TO_CLIENT_ID;
@@ -191,52 +192,52 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
             response.put("body", "{\"message\": \"Table not found\"}");
         }
     }
-//
-//    private void handleCreateReservation(Map<String, Object> event, Map<String, Object> response) throws Exception {
-//        Map<String, Object> body = parseRequestBody(event);
-//        int tableNumber = (int) body.get("tableNumber");
-//        String reservationDate = (String) body.get("date");
-//        String slotTimeStart = (String) body.get("slotTimeStart");
-//        String slotTimeEnd = (String) body.get("slotTimeEnd");
-//        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-//        Date proposedTimeStart = timeFormat.parse(slotTimeStart);
-//        Date proposedTimeEnd = timeFormat.parse(slotTimeEnd);
-//        ItemCollection<ScanOutcome> reservations = reservationsTable.scan(new ScanSpec());
-//
-//        for (Item item : reservations) {
-//            if (tableNumber == item.getInt("tableNumber") &&
-//                    reservationDate.equals(item.getString("date"))) {
-//                Date bookedStartTime = timeFormat.parse(item.getString("slotTimeStart"));
-//                Date bookedEndTime = timeFormat.parse(item.getString("slotTimeEnd"));
-//                if (!(proposedTimeEnd.before(bookedStartTime) || proposedTimeStart.after(bookedEndTime))) {
-//                    response.put("statusCode", 400);
-//                    response.put("body", "{\"message\": \"Table already booked for this time slot.\"}");
-//                    return;
-//                }
-//            }
-//        }
-//
-//        Item reservation = new Item()
-//                .withPrimaryKey("tableNumber", tableNumber)
-//                .withString("date", reservationDate)
-//                .withString("slotTimeStart", slotTimeStart)
-//                .withString("slotTimeEnd", slotTimeEnd)
-//                .withString("userId", (String) body.get("userId"));
-//        reservationsTable.putItem(reservation);
-//        response.put("statusCode", 200);
-//        response.put("body", "{\"message\": \"Reservation successful\"}");
-//    }
-//
-//    private void handleGetReservations(Map<String, Object> response) throws Exception {
-//        ItemCollection<ScanOutcome> items = reservationsTable.scan(new ScanSpec());
-//        List<Item> itemList = new ArrayList<>();
-//        items.forEach(itemList::add);
-//
-//        ObjectMapper mapper = new ObjectMapper();
-//        String body = mapper.writeValueAsString(Collections.singletonMap("reservations", itemList));
-//        response.put("statusCode", 200);
-//        response.put("body", body);
-//    }
+
+    private void handleCreateReservation(Map<String, Object> event, Map<String, Object> response) throws Exception {
+        Map<String, Object> body = parseRequestBody(event);
+        int tableNumber = (int) body.get("tableNumber");
+        String reservationDate = (String) body.get("date");
+        String slotTimeStart = (String) body.get("slotTimeStart");
+        String slotTimeEnd = (String) body.get("slotTimeEnd");
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+        Date proposedTimeStart = timeFormat.parse(slotTimeStart);
+        Date proposedTimeEnd = timeFormat.parse(slotTimeEnd);
+        ItemCollection<ScanOutcome> reservations = reservationsTable.scan(new ScanSpec());
+
+        for (Item item : reservations) {
+            if (tableNumber == item.getInt("tableNumber") &&
+                    reservationDate.equals(item.getString("date"))) {
+                Date bookedStartTime = timeFormat.parse(item.getString("slotTimeStart"));
+                Date bookedEndTime = timeFormat.parse(item.getString("slotTimeEnd"));
+                if (!(proposedTimeEnd.before(bookedStartTime) || proposedTimeStart.after(bookedEndTime))) {
+                    response.put("statusCode", 400);
+                    response.put("body", "{\"message\": \"Table already booked for this time slot.\"}");
+                    return;
+                }
+            }
+        }
+
+        Item reservation = new Item()
+                .withPrimaryKey("tableNumber", tableNumber)
+                .withString("date", reservationDate)
+                .withString("slotTimeStart", slotTimeStart)
+                .withString("slotTimeEnd", slotTimeEnd)
+                .withString("userId", (String) body.get("userId"));
+        reservationsTable.putItem(reservation);
+        response.put("statusCode", 200);
+        response.put("body", "{\"message\": \"Reservation successful\"}");
+    }
+
+    private void handleGetReservations(Map<String, Object> response) throws Exception {
+        ItemCollection<ScanOutcome> items = reservationsTable.scan(new ScanSpec());
+        List<Item> itemList = new ArrayList<>();
+        items.forEach(itemList::add);
+
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(Collections.singletonMap("reservations", itemList));
+        response.put("statusCode", 200);
+        response.put("body", body);
+    }
 
     private Map<String, Object> parseRequestBody(Map<String, Object> event) throws Exception {
         String body = (String) event.get("body");

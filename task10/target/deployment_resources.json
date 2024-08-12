@@ -22,14 +22,14 @@
       "reservations_table" : "${reservations_table}",
       "tables_table" : "${tables_table}",
       "Cognito_ID" : {
+        "resource_name" : "${booking_userpool}",
         "resource_type" : "cognito_idp",
-        "parameter" : "id",
-        "resource_name" : "${booking_userpool}"
+        "parameter" : "id"
       },
       "Client_ID" : {
+        "resource_name" : "${booking_userpool}",
         "resource_type" : "cognito_idp",
-        "parameter" : "client_id",
-        "resource_name" : "${booking_userpool}"
+        "parameter" : "client_id"
       },
       "region" : "${region}"
     },
