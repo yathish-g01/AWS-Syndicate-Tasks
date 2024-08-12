@@ -72,10 +72,10 @@ public class ApiHandler implements RequestHandler<Map<String, Object>, Map<Strin
                 handleCreateTable(event, response);
             } else if (path.matches("/tables/\\d+") && "GET".equals(httpMethod)) {
                 handleGetTableById(path, response);
-//            } else if ("/reservations".equals(path) && "POST".equals(httpMethod)) {
-//                handleCreateReservation(event, response);
-//            } else if ("/reservations".equals(path) && "GET".equals(httpMethod)) {
-//                handleGetReservations(response);
+            } else if ("/reservations".equals(path) && "POST".equals(httpMethod)) {
+                handleCreateReservation(event, response);
+            } else if ("/reservations".equals(path) && "GET".equals(httpMethod)) {
+                handleGetReservations(response);
             } else {
                 throw new UnsupportedOperationException("Unsupported operation: " + path + " " + httpMethod);
             }
