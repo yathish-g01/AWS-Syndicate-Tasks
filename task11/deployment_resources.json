@@ -70,7 +70,6 @@
     "resource_type": "iam_role"
   },
 
-
   "Tables": {
     "resource_type": "dynamodb_table",
     "hash_key_name": "id",
