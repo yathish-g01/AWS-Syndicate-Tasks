@@ -3,7 +3,7 @@
     "name" : "api_handler",
     "lambda_path" : "C:\\Users\\yathish_g\\AWS-Syndicate-Tasks\\task11",
     "version" : "1.0.0",
-    "func_name" : "com.task11.ApiHandler",
+    "func_name" : "com.task11.APIHandler",
     "deployment_package" : "task11-1.0.0.jar",
     "resource_type" : "lambda",
     "runtime" : "java17",
